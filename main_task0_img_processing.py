@@ -35,13 +35,32 @@ def partA():
     os.rename("stats.csv",gen_path + "stats.csv" )
 
 def partB():
-    pass
+    
+    cat_img = cv2.imread(img_path + "cat.jpg") 
+    red_img = cat_img.copy()
+    red_img[:,:,0] = 0
+    red_img[:,:,1] = 0
+    cv2.imwrite(gen_path + 'cat_red.jpg',red_img)
+    
 
 def partC():
-    pass
+    flower_img = cv2.imread(img_path + "flowers.jpg") 
+    b_channel,g_channel,r_channel = cv2.split(flower_img)
+    alpha_channel = np.ones(r_channel.shape,dtype = r_channel.dtype) * 127
+    flower_imga = cv2.merge((b_channel,g_channel,r_channel,alpha_channel))
+    cv2.imwrite(gen_path + 'flowers_alpha.png', flower_imga)
+    
 
 def partD():
-    pass
+    horse_img = cv2.imread(img_path + "horse.jpg")
+    b_channel,g_channel,r_channel = cv2.split(horse_img)
+    i_channel = np.ones(b_channel.shape,dtype = b_channel.dtype)
+    for i in range(0,b_channel.shape[0]):
+        for j in range(0,b_channel.shape[1]) : 
+            i_channel[i][j] = 0.3 * r_channel[i][j] + 0.59 * g_channel[i][j]  + 0.11 * b_channel[i][j]
+    
+    cv2.imwrite(gen_path + 'horse_gray.jpg',i_channel)
+
 
 partA()
 partB()
