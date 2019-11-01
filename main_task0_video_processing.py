@@ -4,12 +4,10 @@ import os
 
 def partA():
     vid = cv2.VideoCapture('../Videos/RoseBloom.mp4')
-    if (vid.isOpened() == FALSE):
-        print("Incorrect path name or no video")
     suc,img = vid.read();
     frame_count = 0
     while suc:
-        if (frame_count == 5) :
+        if (frame_count == 150):
             cv2.imwrite('../Generated/frame_as_6.jpg',img)
         suc,img = vid.read()
         frame_count += 1
