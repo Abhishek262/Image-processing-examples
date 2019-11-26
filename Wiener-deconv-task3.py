@@ -196,7 +196,7 @@ def main(val):
     ## calling the algorithm function
     op_image, aruco_info = process(frame)
     # saving the output in  a list variable
-    line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
+    line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(ArUco_info[3])]
     ## incrementing counter variable
     i+=1
     ## verifying all data
