@@ -4,7 +4,6 @@
 ## Instructions: Do Not modify the basic skeletal structure of given APIs!!!
 ###############################################################################
 
-
 ######################
 ## Essential libraries
 ######################
@@ -73,28 +72,19 @@ def process(ip_image):
     crop_img =ip_image[y:y+h, x:x+w]
     ##cv2.imshow("cropped", crop_img)
     ip_image=crop_img
-    ip_image = cv2.cvtColor(ip_image, cv2.COLOR_BGR2GRAY)
-    # cv2.imwrite('temp_image_ipgray.png',ip_image)
+    want=ip_image
+    blue= want[:,:,0]
+    green= want[:,:,1]
+    red= want[:,:,2]
 
-    ip_image = np.float32(ip_image)/255.0
-
-    # cv2.imshow('image',ip_image)
-    # img = blur_edge(ip_image)
-    # cv2.waitKey(0)
-
+    #ip_image = cv2.cvtColor(blue, cv2.COLOR_BGR2GRAY)
+    ip_image = np.float32(blue)/255.0
     ang = np.deg2rad(90)
     d = 20
     noise = 10**(-0.1*30)
-
     img = blur_edge(ip_image)
-    
-
-
-    # psf = defocus_kernel(d)
     psf = motion_kernel(ang, d)
-
     IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
-
     psf /= psf.sum()
     psf_pad = np.zeros_like(ip_image)
     kh, kw = psf.shape
@@ -106,27 +96,57 @@ def process(ip_image):
     res = cv2.idft(RES, flags=cv2.DFT_SCALE | cv2.DFT_REAL_OUTPUT )
     res = np.roll(res, -kh//2, 0)
     res = np.roll(res, -kw//2, 1)
-    cv2.imshow('res.png',res)
+    blue=res
+
+    ip_image = np.float32(green)/255.0
+    ang = np.deg2rad(90)
+    d = 20
+    noise = 10**(-0.1*30)
+    img = blur_edge(ip_image)
+    psf = motion_kernel(ang, d)
+    IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
+    psf /= psf.sum()
+    psf_pad = np.zeros_like(ip_image)
+    kh, kw = psf.shape
+    psf_pad[:kh, :kw] = psf
+    PSF = cv2.dft(psf_pad, flags=cv2.DFT_COMPLEX_OUTPUT, nonzeroRows = kh)
+    PSF2 = (PSF**2).sum(-1)
+    iPSF = PSF / (PSF2 + noise)[...,np.newaxis]
+    RES = cv2.mulSpectrums(IMG, iPSF, 0)
+    res = cv2.idft(RES, flags=cv2.DFT_SCALE | cv2.DFT_REAL_OUTPUT )
+    res = np.roll(res, -kh//2, 0)
+    res = np.roll(res, -kw//2, 1)
+    green=res
+
+
+    ip_image = np.float32(red)/255.0
+    ang = np.deg2rad(90)
+    d = 20
+    noise = 10**(-0.1*30)
+    img = blur_edge(ip_image)
+    psf = motion_kernel(ang, d)
+    IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
+    psf /= psf.sum()
+    psf_pad = np.zeros_like(ip_image)
+    kh, kw = psf.shape
+    psf_pad[:kh, :kw] = psf
+    PSF = cv2.dft(psf_pad, flags=cv2.DFT_COMPLEX_OUTPUT, nonzeroRows = kh)
+    PSF2 = (PSF**2).sum(-1)
+    iPSF = PSF / (PSF2 + noise)[...,np.newaxis]
+    RES = cv2.mulSpectrums(IMG, iPSF, 0)
+    res = cv2.idft(RES, flags=cv2.DFT_SCALE | cv2.DFT_REAL_OUTPUT )
+    res = np.roll(res, -kh//2, 0)
+    res = np.roll(res, -kw//2, 1)
+    red=res
+
+    color = cv2.merge([blue,green,red])
+    cv2.imshow('de_blur',color)
+    ##cv2.imshow('res',gray)
     cv2.waitKey(0)
-    print(len(res[0]))
-
-    cv2.imshow('res',res)
-
-    resc = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
-    #status=cv2.imwrite(generated_folder_path+"/"+"gen.jpg",ip_image)
-    #print("Image written to file-system : ",status)
-    
+    ip_image=color
+	
     return ip_image, id_list
-   
-
-
-
-
-
-
-
-
-
+    
 
 ####################################################################
 ## The main program which provides read in input of one image at a
@@ -159,7 +179,7 @@ def main(val):
     ##cv2.waitKey(0);
     ## calling the algorithm function
     op_image, aruco_info = process(frame)
-'''    ## saving the output in  a list variable
+    ## saving the output in  a list variable
     line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
     ## incrementing counter variable
     i+=1
@@ -173,7 +193,7 @@ def main(val):
     ## closing csv file    
     writeFile.close()
 
-'''
+
 
     
 
