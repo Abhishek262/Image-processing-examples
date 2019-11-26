@@ -176,7 +176,7 @@ def main(val):
     ################################################################
     i = 1
     ## reading in video 
-    cap = cv2.VideoCapture(images_folder_path+"/"+"aruco_bot.mp4")
+    cap = cv2.VideoCapture(images_folder_path+"/"+"ArUco_bot.mp4")
     ## getting the frames per second value of input video
     fps = cap.get(cv2.CAP_PROP_FPS)
     ##print(fps)
@@ -196,7 +196,7 @@ def main(val):
     ## calling the algorithm function
     op_image, aruco_info = process(frame)
     # saving the output in  a list variable
-    line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(ArUco_info[3])]
+    line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
     ## incrementing counter variable
     i+=1
     ## verifying all data
