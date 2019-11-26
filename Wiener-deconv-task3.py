@@ -35,32 +35,41 @@ generated_folder_path = os.path.abspath(os.path.join('..', 'Generated'))
 ## the corresponding image
 ############################################
 
-def blur_edge(img, d=31):
-    h, w  = img.shape[:2]
-    img_pad = cv2.copyMakeBorder(img, d, d, d, d, cv2.BORDER_WRAP)
-    img_blur = cv2.GaussianBlur(img_pad, (2*d+1, 2*d+1), -1)[d:-d,d:-d]
-    y, x = np.indices((h, w))
-    dist = np.dstack([x, w-x-1, y, h-y-1]).min(-1)
-    w = np.minimum(np.float32(dist)/d, 1.0)
-    return img*w + img_blur*(1-w)
-
-def motion_kernel(angle, d, sz=65):
-    kern = np.ones((1, d), np.float32)
-    c, s = np.cos(angle), np.sin(angle)     
-    A = np.float32([[c, -s, 0], [s, c, 0]])
-    sz2 = sz // 2
-    A[:,2] = (sz2, sz2) - np.dot(A[:,:2], ((d-1)*0.5, 0))
-    kern = cv2.warpAffine(kern, A, (sz, sz), flags=cv2.INTER_CUBIC)
-    return kern
-
-def defocus_kernel(d, sz=65):
-    kern = np.zeros((sz, sz), np.uint8)
-    cv2 .motion(kern, (sz, sz), d, 255, -1, cv2.LINE_AA, shift=1)
-    kern = np.float32(kern) / 255.0
-    return kern
 
 
 def process(ip_image):
+
+
+
+    def blur_edge(img, d=31):
+        h, w  = img.shape[:2]
+        img_pad = cv2.copyMakeBorder(img, d, d, d, d, cv2.BORDER_WRAP)
+        img_blur = cv2.GaussianBlur(img_pad, (2*d+1, 2*d+1), -1)[d:-d,d:-d]
+        y, x = np.indices((h, w))
+        dist = np.dstack([x, w-x-1, y, h-y-1]).min(-1)
+        w = np.minimum(np.float32(dist)/d, 1.0)
+        return img*w + img_blur*(1-w)
+
+    def motion_kernel(angle, d, sz=65):
+        kern = np.ones((1, d), np.float32)
+        c, s = np.cos(angle), np.sin(angle)     
+        A = np.float32([[c, -s, 0], [s, c, 0]])
+        sz2 = sz // 2
+        A[:,2] = (sz2, sz2) - np.dot(A[:,:2], ((d-1)*0.5, 0))
+        kern = cv2.warpAffine(kern, A, (sz, sz), flags=cv2.INTER_CUBIC)
+        return kern
+
+    def defocus_kernel(d, sz=65):
+        kern = np.zeros((sz, sz), np.uint8)
+        cv2 .motion(kern, (sz, sz), d, 255, -1, cv2.LINE_AA, shift=1)
+        kern = np.float32(kern) / 255.0
+        return kern
+
+
+
+
+
+
     ###########################
     ## Your Code goes here
     ###########################
@@ -97,6 +106,8 @@ def process(ip_image):
     res = np.roll(res, -kh//2, 0)
     res = np.roll(res, -kw//2, 1)
     blue=res
+    blue=blue*255
+
 
     ip_image = np.float32(green)/255.0
     ang = np.deg2rad(90)
@@ -117,6 +128,7 @@ def process(ip_image):
     res = np.roll(res, -kh//2, 0)
     res = np.roll(res, -kw//2, 1)
     green=res
+    green=green*255
 
 
     ip_image = np.float32(red)/255.0
@@ -138,12 +150,17 @@ def process(ip_image):
     res = np.roll(res, -kh//2, 0)
     res = np.roll(res, -kw//2, 1)
     red=res
+    red=red*255
+
+	
 
     color = cv2.merge([blue,green,red])
     cv2.imshow('de_blur',color)
     ##cv2.imshow('res',gray)
     cv2.waitKey(0)
     ip_image=color
+    status=cv2.imwrite(generated_folder_path+"/"+"color.jpg",color)
+    print("success",status)
 	
     return ip_image, id_list
     
