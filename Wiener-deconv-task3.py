@@ -209,6 +209,7 @@ def main(val):
     # closing csv file    
     writeFile.close()
 
+    os.remove('temp.png')
     cv2.imwrite('../Generated/aruco_with_id.png',op_image)
 
 
