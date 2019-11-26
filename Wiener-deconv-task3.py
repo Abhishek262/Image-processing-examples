@@ -145,15 +145,11 @@ def process(ip_image):
 
 
     color = cv2.merge([blue,green,red])
-    cv2.imshow('de_blur',color)
-    ##cv2.imshow('res',gray)
     cv2.waitKey(0)
     ip_image=color
 	
-    cv2.imwrite('noob.png',color)
-    print(color)
-
-    cx = cv2.imread('noob.png')
+    cv2.imwrite('temp.png',color)
+    cx = cv2.imread('temp.png')
     ar_list = detect_Aruco(cx) 
     rs = calculate_Robot_State(cx,ar_list)
     a_lst = list(rs.values())
@@ -215,9 +211,6 @@ def main(val):
 
     cv2.imwrite('../Generated/aruco_with_id.png',op_image)
 
-
-
-    
 
 ############################################################################################
 ## main function
