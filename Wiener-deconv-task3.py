@@ -39,10 +39,6 @@ generated_folder_path = os.path.abspath(os.path.join('..', 'Generated'))
 
 def blur_edge(img, d=20):
     h, w  = img.shape[:2]
-    print(h)
-    print('....................')
-    print(w)
-
     img_pad = cv2.copyMakeBorder(   img, d, d, d, d, cv2.BORDER_WRAP)
 
     img_blur = cv2.GaussianBlur(img_pad, (2*d+1, 2*d+1), -1)[d:-d,d:-d]
@@ -75,6 +71,8 @@ def process(ip_image):
     ###########################
     id_list = []
     # cv2.imwrite('image_3.png',ip_im31age)
+    ip_image = cv2.cvtColor(ip_image, cv2.COLOR_BGR2GRAY)
+    # cv2.imwrite('temp_image_ipgray.png',ip_image)
 
     ip_image = np.float32(ip_image)/255.0
 
@@ -84,18 +82,16 @@ def process(ip_image):
 
     ang = np.deg2rad(90)
     d = 20
-    noise = 22
+    noise = 10**(-0.1*22)
+
     img = blur_edge(ip_image)
     
-    cv2.imshow('after blur',img)
-    cv2.waitKey(0)
 
-    psf = defocus_kernel(d)
-    # psf = motion_kernel(ang, d)
-    cv2.imshow('psf', psf)
-    cv2.waitKey(0)
+
+    # psf = defocus_kernel(d)
+    psf = motion_kernel(ang, d)
+
     IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
-
 
     psf /= psf.sum()
     psf_pad = np.zeros_like(ip_image)
@@ -108,19 +104,27 @@ def process(ip_image):
     res = cv2.idft(RES, flags=cv2.DFT_SCALE | cv2.DFT_REAL_OUTPUT )
     res = np.roll(res, -kh//2, 0)
     res = np.roll(res, -kw//2, 1)
-    cv2.imshow('img', res)
+    cv2.imshow('res.png',res)
     cv2.waitKey(0)
-    # cv2.imwrite('temp_img.jpg',ip_image)
-    # a_lst = detect_Aruco(ip_image)
+    print(len(res[0]))
+
+    cv2.imshow('res',res)
+
+    resc = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
+    # cv2.imshow('resc',resc)
+    # cv2.waitKey(0)
+    # print(resc)
+    # # print(resc.shape)
+    
+    # cv2.imwrite('imagertfg.jpg',res)
+    # a_lst = detect_Aruco(resc)
     # # calculate_Robot_State(ip_image,a_lst)
 
     # print("Aruco list : ")
     # print(a_lst)
     # print('Position and angle')
-    # print(calculate_Robot_State(ip_image,a_lst))
+    # print(calculate_Robot_State(resc,a_lst))
     
-
-
 
 
     
@@ -150,10 +154,8 @@ def main(val):
     ## display to see if the frame is correct
 
     ## calling the algorithm function
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray image ", gray)
-    cv2.waitKey(0);
-    op_image, aruco_info = process(gray)
+    cv2.imwrite('frame.jpg',frame)
+    process(frame)
     # ## saving the output in  a list variable
     # line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
     # ## incrementing counter variable
