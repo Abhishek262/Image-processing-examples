@@ -19,7 +19,6 @@ import copy
 
 
 
-
 ########################################################################
 ## using os to generalise Input-Output
 ########################################################################
@@ -37,16 +36,13 @@ generated_folder_path = os.path.abspath(os.path.join('..', 'Generated'))
 ## the corresponding image
 ############################################
 
-def blur_edge(img, d=20):
+def blur_edge(img, d=31):
     h, w  = img.shape[:2]
-    img_pad = cv2.copyMakeBorder(   img, d, d, d, d, cv2.BORDER_WRAP)
-
+    img_pad = cv2.copyMakeBorder(img, d, d, d, d, cv2.BORDER_WRAP)
     img_blur = cv2.GaussianBlur(img_pad, (2*d+1, 2*d+1), -1)[d:-d,d:-d]
-
     y, x = np.indices((h, w))
     dist = np.dstack([x, w-x-1, y, h-y-1]).min(-1)
     w = np.minimum(np.float32(dist)/d, 1.0)
-
     return img*w + img_blur*(1-w)
 
 def motion_kernel(angle, d, sz=65):
@@ -60,7 +56,7 @@ def motion_kernel(angle, d, sz=65):
 
 def defocus_kernel(d, sz=65):
     kern = np.zeros((sz, sz), np.uint8)
-    cv2 .circle(kern, (sz, sz), d, 255, -1, cv2.LINE_AA, shift=1)
+    cv2 .motion(kern, (sz, sz), d, 255, -1, cv2.LINE_AA, shift=1)
     kern = np.float32(kern) / 255.0
     return kern
 
@@ -70,7 +66,13 @@ def process(ip_image):
     ## Your Code goes here
     ###########################
     id_list = []
-    # cv2.imwrite('image_3.png',ip_im31age)
+    y=0
+    x=0
+    h=723
+    w=1281
+    crop_img =ip_image[y:y+h, x:x+w]
+    ##cv2.imshow("cropped", crop_img)
+    ip_image=crop_img
     ip_image = cv2.cvtColor(ip_image, cv2.COLOR_BGR2GRAY)
     # cv2.imwrite('temp_image_ipgray.png',ip_image)
 
@@ -82,7 +84,7 @@ def process(ip_image):
 
     ang = np.deg2rad(90)
     d = 20
-    noise = 10**(-0.1*22)
+    noise = 10**(-0.1*30)
 
     img = blur_edge(ip_image)
     
@@ -111,23 +113,21 @@ def process(ip_image):
     cv2.imshow('res',res)
 
     resc = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
-    # cv2.imshow('resc',resc)
-    # cv2.waitKey(0)
-    # print(resc)
-    # # print(resc.shape)
+    #status=cv2.imwrite(generated_folder_path+"/"+"gen.jpg",ip_image)
+    #print("Image written to file-system : ",status)
     
-    # cv2.imwrite('imagertfg.jpg',res)
-    # a_lst = detect_Aruco(resc)
-    # # calculate_Robot_State(ip_image,a_lst)
-
-    # print("Aruco list : ")
-    # print(a_lst)
-    # print('Position and angle')
-    # print(calculate_Robot_State(resc,a_lst))
-    
+    return ip_image, id_list
+   
 
 
-    
+
+
+
+
+
+
+
+
 ####################################################################
 ## The main program which provides read in input of one image at a
 ## time to process function in which you will code your generalized
@@ -140,9 +140,10 @@ def main(val):
     ################################################################
     i = 1
     ## reading in video 
-    cap = cv2.VideoCapture(images_folder_path+"/"+"aruco_bot.mp4")
+    cap = cv2.VideoCapture(images_folder_path+"/"+"ArUco_bot.mp4")
     ## getting the frames per second value of input video
     fps = cap.get(cv2.CAP_PROP_FPS)
+    ##print(fps)
     ## getting the frame sequence
     frame_seq = int(val)*fps
     ## setting the video counter to frame sequence
@@ -152,25 +153,27 @@ def main(val):
     ## verifying frame has content
     print(frame.shape)
     ## display to see if the frame is correct
-
+    ##cv2.imshow("cropped", crop_img)
+    ##frame=crop_img########
+    ##cv2.imshow("window", frame)
+    ##cv2.waitKey(0);
     ## calling the algorithm function
-    cv2.imwrite('frame.jpg',frame)
-    process(frame)
-    # ## saving the output in  a list variable
-    # line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
-    # ## incrementing counter variable
-    # i+=1
-    # ## verifying all data
-    # print(line)
-    # ## writing to angles.csv in Generated folder without spaces
-    # with open(generated_folder_path+"/"+'output.csv', 'w') as writeFile:
-    #     print("About to write csv")
-    #     writer = csv.writer(writeFile)
-    #     writer.writerow(line)
-    # ## closing csv file    
-    # writeFile.close()
+    op_image, aruco_info = process(frame)
+'''    ## saving the output in  a list variable
+    line = [str(i), "Aruco_bot.jpg" , str(aruco_info[0]), str(aruco_info[3])]
+    ## incrementing counter variable
+    i+=1
+    ## verifying all data
+    print(line)
+    ## writing to angles.csv in Generated folder without spaces
+    with open(generated_folder_path+"/"+'output.csv', 'w') as writeFile:
+        print("About to write csv")
+        writer = csv.writer(writeFile)
+        writer.writerow(line)
+    ## closing csv file    
+    writeFile.close()
 
-
+'''
 
     
 
@@ -179,6 +182,3 @@ def main(val):
 ############################################################################################
 if __name__ == '__main__':
     main(input("time value in seconds:"))
-    # a = cv2.imread('unblurred_image.png')
-
-    # process(a)
