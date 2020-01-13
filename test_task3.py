@@ -129,15 +129,16 @@ def process(ip_image):
 
 
 def process2(ip_image):
-    ip_image = cv2.GaussianBlur(ip_image,(3,3),0)
+    n_image = ip_image.copy()
+    # ip_image = cv2.GaussianBlur(ip_image,(3,3),0)
     hsv = cv2.cvtColor(ip_image, cv2.COLOR_BGR2HSV) 
-    lower_red = np.array([170,142,107]) 
-    upper_red = np.array([180,192,190]) 
+    lower_red = np.array([170,170,127]) 
+    upper_red = np.array([180,254,190]) 
 
-    lower_white = np.array([0,0,217]) 
-    upper_white = np.array([180,25,268]) 
+    lower_white = np.array([0,0,200]) 
+    upper_white = np.array([180,40,268]) 
 
-    lower_green = np.array([35, 150,100]) 
+    lower_green = np.array([35, 100,150]) 
     upper_green = np.array([50,255,254]) 
   
 
@@ -165,13 +166,19 @@ def process2(ip_image):
         #finding centroids of the blobs created above
     for i in range(0,maskr.shape[0]):
         for j in range(0,maskr.shape[1]):
-            if maskr[i,j] ==255:
-                red_pixel_coords.append([i,j])
+            if i in range(180,300) and j in range(240,400) : 
+                pass
+            else:
+                if maskr[i,j] ==255:
+                    red_pixel_coords.append([i,j])
 
     for i in range(0,maskg.shape[0]):
         for j in range(0,maskg.shape[1]):
-            if maskg[i,j] ==255:
-                green_pixel_coords.append([i,j])
+            if i in range(180,300) and j in range(240,400) : 
+                pass
+            else:
+                if maskg[i,j] ==255:
+                    green_pixel_coords.append([i,j])
 
 
     centroid_r = [0,0]
@@ -209,9 +216,9 @@ def process2(ip_image):
     # print()
     # print(green_pixel_coords)
     # print()
-    cv2.imshow('maskw',maskw)
-    cv2.imshow('maskr',maskr)
-    cv2.imshow('maskg',maskg)
+    # cv2.imshow('maskw',maskw)
+    # cv2.imshow('maskr',maskr)
+    # cv2.imshow('maskg',maskg)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -225,12 +232,18 @@ def process2(ip_image):
     angle = math.acos(cos_angle)
     angle = math.degrees(angle)
 
- 
+    edge_point_y = min([j for j in center_pixel_coords[0]])
+    # print("edge pt : " + str(edge_point_y))
+    edge_pt_lst = [j for i,j in center_pixel_coords if(i==edge_point_y)]
+    # print(edge_pt_lst)
+    edge_point_x = math.ceil(sum(edge_pt_lst)/len(edge_pt_lst))
+    # print(edge_point_x,edge_point_y)
+    rad_c = math.sqrt((centroid_c[0] -edge_point_y )**2  +  (centroid_c[1] - edge_point_x)**2 )
 
     op_image = ip_image.copy()
-    cv2.circle(op_image,(math.ceil(centroid_r[1]),math.ceil(centroid_r[0])),round(20),(255,0,0),thickness=2)
-    cv2.circle(op_image,(math.ceil(centroid_g[1]),math.ceil(centroid_g[0])),round(20),(255,0,0),thickness=2)
-    cv2.circle(op_image,(math.ceil(centroid_c[1]),math.ceil(centroid_c[0])),round(20),(255,0,0),thickness=2)
+    cv2.circle(n_image,(math.ceil(centroid_r[1]),math.ceil(centroid_r[0])),round(rad_c)+1,(255,0,0),thickness=2)
+    cv2.circle(n_image,(math.ceil(centroid_g[1]),math.ceil(centroid_g[0])),round(rad_c)+1,(255,0,0),thickness=2)
+    cv2.circle(n_image,(math.ceil(centroid_c[1]),math.ceil(centroid_c[0])),round(rad_c)+1,(255,0,0),thickness=2)
     
 
     print(len(red_pixel_coords))
@@ -238,8 +251,8 @@ def process2(ip_image):
 
     #to blit angle in the picture
     txt = "Angle : " + str(math.ceil(angle))
-    cv2.putText(op_image,txt,(35,35),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-    cv2.imshow("w",op_image)
+    cv2.putText(n_image,txt,(35,35),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
+    cv2.imshow("w",n_image)
     cv2.waitKey(0)    
 
 
@@ -258,7 +271,7 @@ def main():
     ################################################################
     i = 1
     ## reading in video 
-    cap = cv2.VideoCapture('vid1.avi') #if you have a webcam on your system, then change 0 to 1
+    cap = cv2.VideoCapture('vid2.avi') #if you have a webcam on your system, then change 0 to 1
     ## getting the frames per second value of input video
     fps = cap.get(cv2.CAP_PROP_FPS)
     ## setting the video counter to frame sequence
