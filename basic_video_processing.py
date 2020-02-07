@@ -21,5 +21,7 @@ def partB():
     cv2.imwrite('../Generated/frame_as_6_red.jpg',red_img)
     pass
 
-partA()
-partB()
+
+if __name__ =="__main__":
+    partA()
+    partB()

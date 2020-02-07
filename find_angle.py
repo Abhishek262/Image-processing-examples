@@ -1,13 +1,4 @@
-###############################################################################
-## Author: Team Supply Bot
-## Edition: eYRC 2019-20
-## Instructions: Do Not modify the basic skeletal structure of given APIs!!!
-###############################################################################
 
-
-######################
-## Essential libraries
-######################
 import cv2
 import numpy as np
 import os
@@ -15,27 +6,13 @@ import math
 import csv
 
 
-
-
-########################################################################
-## using os to generalise Input-Output
-########################################################################
 codes_folder_path = os.path.abspath('.')
 images_folder_path = os.path.abspath(os.path.join('..', 'Images'))
 generated_folder_path = os.path.abspath(os.path.join('..', 'Generated'))
 
 
-
-
-############################################
-## Build your algorithm in this function
-## ip_image: is the array of the input image
-## imshow helps you view that you have loaded
-## the corresponding image
-############################################
 def process(ip_image):
-    ###########################
-    ## Your Code goes here
+
     angle = 0.00
     #start from the center of the circle
     mid_pixel_coord_x = ip_image.shape[0]//2 - 1
@@ -118,18 +95,8 @@ def process(ip_image):
 
 
 
-
-    
-####################################################################
-## The main program which provides read in input of one image at a
-## time to process function in which you will code your generalized
-## output computing code
-## Do not modify this code!!!
-####################################################################
 def main():
-    ################################################################
-    ## variable declarations
-    ################################################################
+
     i = 1
     line = []
     ## Reading 1 image at a time from the Images folder
@@ -156,12 +123,6 @@ def main():
     writeFile.close()
 
 
-
-    
-
-###########################################################################################
-# main function
-###########################################################################################
 if __name__ == '__main__':
     main()
 

@@ -62,7 +62,8 @@ def partD():
     cv2.imwrite(gen_path + 'horse_gray.jpg',i_channel)
 
 
-partA()
-partB()
-partC()
-partD()
+if __name__ == "__main__":
+    partA()
+    partB()
+    partC()
+    partD()

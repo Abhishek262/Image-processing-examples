@@ -1,12 +1,11 @@
-###############################################################################
-## Author: Team Supply Bot
-## Edition: eYRC 2019-20
-## Instructions: Do Not modify the basic skeletal structure of given APIs!!!
-###############################################################################
+'''
+Takes a blurred image, applies Wiener deconvolution to it and returns an unblurred image.
+To get a colored image, takes individual R,G,B components, applies the filter over it
+based on the parameters (chosen for each component).
+Can be used for motion blur reduction.
 
-######################
-## Essential libraries
-######################
+'''
+
 import cv2
 import numpy as np
 import os
@@ -16,24 +15,10 @@ import cv2.aruco as aruco
 from aruco_lib import *
 import copy
 
-
-
-########################################################################
-## using os to generalise Input-Output
-########################################################################
 codes_folder_path = os.path.abspath('.')
 images_folder_path = os.path.abspath(os.path.join('..', 'Videos'))
 generated_folder_path = os.path.abspath(os.path.join('..', 'Generated'))
 
-
-
-
-############################################
-## Build your algorithm in this function
-## ip_image: is the array of the input image
-## imshow helps you view that you have loaded
-## the corresponding image
-############################################
 
 def blur_edge(img, d=31):
     h, w  = img.shape[:2]
@@ -61,10 +46,9 @@ def defocus_kernel(d, sz=65):
 
 
 def process(ip_image):
-    ###########################
-    ## Your Code goes here
-    ###########################
+
     id_list = []
+    #modifiable parameters for image cropping
     y=0
     x=0
     h=723
@@ -79,9 +63,12 @@ def process(ip_image):
 
     #ip_image = cv2.cvtColor(blue, cv2.COLOR_BGR2GRAY)
     ip_image = np.float32(blue)/255.0
+
+    #kernel parameters
     ang = np.deg2rad(90)
     d = 20
     noise = 10**(-0.1*30)
+
     img = blur_edge(ip_image)
     psf = motion_kernel(ang, d)
     IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
@@ -99,9 +86,12 @@ def process(ip_image):
     blue=res
 
     ip_image = np.float32(green)/255.0
+
+    #kernel parameters
     ang = np.deg2rad(90)
     d = 20
     noise = 10**(-0.1*30)
+
     img = blur_edge(ip_image)
     psf = motion_kernel(ang, d)
     IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
@@ -120,9 +110,13 @@ def process(ip_image):
 
 
     ip_image = np.float32(red)/255.0
+
+    #kernel parameters
     ang = np.deg2rad(90)
     d = 20
     noise = 10**(-0.1*30)
+
+
     img = blur_edge(ip_image)
     psf = motion_kernel(ang, d)
     IMG = cv2.dft(img, flags=cv2.DFT_COMPLEX_OUTPUT)
@@ -162,18 +156,9 @@ def process(ip_image):
 
 
     return op_image, aruco_info
-    
 
-####################################################################
-## The main program which provides read in input of one image at a
-## time to process function in which you will code your generalized
-## output computing code
-## Do not modify this code!!!
-####################################################################
 def main(val):
-    ################################################################
-    ## variable declarations
-    ################################################################
+
     i = 1
     ## reading in video 
     cap = cv2.VideoCapture(images_folder_path+"/"+"ArUco_bot.mp4")
