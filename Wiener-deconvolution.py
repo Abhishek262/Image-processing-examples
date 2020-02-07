@@ -56,10 +56,10 @@ def process(ip_image):
     crop_img =ip_image[y:y+h, x:x+w]
     ##cv2.imshow("cropped", crop_img)
     ip_image=crop_img
-    want=ip_image
-    blue= want[:,:,0]
-    green= want[:,:,1]
-    red= want[:,:,2]
+    spl=ip_image
+    blue= spl[:,:,0]
+    green= spl[:,:,1]
+    red= spl[:,:,2]
 
     #ip_image = cv2.cvtColor(blue, cv2.COLOR_BGR2GRAY)
     ip_image = np.float32(blue)/255.0
